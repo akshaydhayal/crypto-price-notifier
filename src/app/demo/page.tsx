@@ -43,7 +43,7 @@ export default function Home() {
           setLoading(false);
 
           // Fetch live data after showing stale data
-          setFetchingLiveData(true);
+          setFetchingLiveData(false);
           const liveResponse = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
             params: {
               vs_currency: "usd",
@@ -81,7 +81,7 @@ export default function Home() {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white w-screen">
-      <Header />
+      {/* <Header /> */}
 
       {/* Live Data Fetching Indicator */}
       <div className="container mx-auto text-center py-2">
