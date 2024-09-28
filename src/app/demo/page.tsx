@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import Header from "@/components/Header";
 
 const tokenIds = {
   AKT: "akash-network",
@@ -17,82 +18,121 @@ const tokenIds = {
   stATOM: "stride-staked-atom",
 };
 
-const HomePage = () => {
-  const [tokens, setTokens] = useState({});
+export default function Home() {
+  const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchingLiveData, setFetchingLiveData] = useState(false);
 
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        // Construct the token IDs as a comma-separated string
         const ids = Object.values(tokenIds).join(",");
+        // Simulate initial stale data (1-second delay for demonstration)
+        setTimeout(async () => {
+          const staleResponse = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
+            params: {
+              vs_currency: "usd",
+              ids: ids,
+              order: "market_cap_desc",
+              per_page: 50,
+              page: 1,
+              sparkline: false,
+            },
+          });
+          setTokens(staleResponse.data);
+          setLoading(false);
 
-        // Make the request to the CoinGecko API to get the specific tokens with market cap and images
-        const response = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
-          params: {
-            vs_currency: "usd",
-            ids: ids, // Only fetch the tokens we need
-            order: "market_cap_desc", // Sort by market cap
-            per_page: 50,
-            page: 1,
-            sparkline: false,
-          },
-        });
-
-        // Set token data into state
-        const formattedData = response.data.reduce((acc, token) => {
-          acc[token.symbol.toUpperCase()] = {
-            price: token.current_price,
-            price_percent_change_24h: token.price_change_percentage_24h,
-            market_cap: token.market_cap,
-            image: token.image,
-          };
-          return acc;
-        }, {});
-        console.log(formattedData);
-        setTokens(formattedData);
-        setLoading(false);
+          // Fetch live data after showing stale data
+          setFetchingLiveData(true);
+          const liveResponse = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
+            params: {
+              vs_currency: "usd",
+              ids: ids,
+              order: "market_cap_desc",
+              per_page: 50,
+              page: 1,
+              sparkline: false,
+            },
+          });
+          setTokens(liveResponse.data);
+          setFetchingLiveData(false);
+        }, 1000);
       } catch (error) {
         console.error("Error fetching token data:", error);
         setLoading(false);
+        setFetchingLiveData(false);
       }
     };
 
     fetchTokens();
   }, []);
 
+  const handleSetAlert = (token) => {
+    alert(`Set up an alert for ${token.name} at $${token.current_price}`);
+  };
+
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="bg-gray-900 min-h-screen flex justify-center items-center text-white">
+        <p className="animate-pulse">Loading tokens...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
-      <header className="py-8 bg-gray-800 shadow-md">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-4">Crypto Price Alert</h1>
-          <p className="text-lg">Stay updated with real-time cryptocurrency prices.</p>
+    <div className="bg-gray-900 min-h-screen text-white w-screen">
+      <Header />
+
+      {/* Live Data Fetching Indicator */}
+      <div className="container mx-auto text-center py-2">
+        {fetchingLiveData ? (
+          <p className="text-yellow-400 animate-pulse">Fetching live token prices...</p>
+        ) : (
+          <p className="text-green-400">Live prices updated</p>
+        )}
+      </div>
+
+      <div className="container mx-auto px-4 py-4 w-4/5">
+        <div className="overflow-x-auto">
+          <table className="w-full bg-gray-800 rounded-lg shadow-md">
+            <thead>
+              <tr className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
+                <th className="py-3 px-6 text-left text-lg font-semibold">#</th>
+                <th className="py-3 px-6 text-left text-lg font-semibold">Token</th>
+                <th className="py-3 px-6 text-left text-lg font-semibold">Price (USD)</th>
+                <th className="py-3 px-6 text-left text-lg font-semibold">Market Cap</th>
+                <th className="py-3 px-6 text-left text-lg font-semibold">Alert</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tokens.map((token, index) => (
+                <tr
+                  key={token.id}
+                  className={`border-b border-gray-700 hover:bg-gray-700 transition duration-200 ${fetchingLiveData ? "text-gray-400" : "text-white"}`}
+                >
+                  <td className="py-4 px-6 text-base font-medium">{index + 1}</td>
+                  <td className="py-4 px-6 flex items-center">
+                    <img src={token.image} alt={token.name} className="w-8 h-8 mr-3 rounded-full shadow-md" />
+                    <span className="text-base font-medium">{token.name}</span>
+                  </td>
+                  <td className={`py-4 px-6 text-base font-medium ${fetchingLiveData ? "animate-pulse" : "text-green-400"}`}>
+                    ${token.current_price.toLocaleString()}
+                  </td>
+                  <td className="py-4 px-6 text-base font-medium">${token.market_cap.toLocaleString()}</td>
+                  <td className="py-4 px-6">
+                    <button
+                      onClick={() => handleSetAlert(token)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200"
+                    >
+                      Set Alert
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </header>
-      <main className="container mx-auto mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {Object.keys(tokens).map((symbol) => (
-            <div key={symbol} className="bg-gray-800 p-4 rounded-lg shadow-lg">
-              <div className="flex items-center">
-                <img src={tokens[symbol].image} alt={symbol} className="w-10 h-10 mr-4" />
-                <h2 className="text-xl font-bold">{symbol}</h2>
-              </div>
-              <p className="text-lg mt-2">Price: ${tokens[symbol].price.toFixed(2)}</p>
-              <p className={`text-lg ${tokens[symbol].price_percent_change_24h >= 0 ? "text-green-500" : "text-red-500"}`}>
-                24h Change: {tokens[symbol].price_percent_change_24h?.toFixed(2)}%
-              </p>
-              <p className="text-lg">Market Cap: ${tokens[symbol].market_cap.toLocaleString()}</p>
-              <button className="mt-4 px-4 py-2 bg-blue-500 rounded-lg">Set Price Alert</button>
-            </div>
-          ))}
-        </div>
-      </main>
+      </div>
     </div>
   );
-};
-
-export default HomePage;
+}
