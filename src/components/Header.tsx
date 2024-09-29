@@ -1,15 +1,16 @@
 "use client";
+import { dbConnect } from "@/db/dbConnect";
 import React, { useEffect, useState } from "react";
 import { FaBell } from "react-icons/fa";
 
 const Header = ({setLivePriceData}) => {
-  const [liveData, setLiveData] = useState<string | null>(null);
+  // const [liveData, setLiveData] = useState<string | null>(null);
 
   useEffect(() => {
     const eventSource = new EventSource("/api/nats");
 
     eventSource.onmessage = (event) => {
-      setLiveData(event.data);
+      // setLiveData(event.data);
       setLivePriceData(JSON.parse(event.data));
       console.log('type event data : ',typeof(event.data));
     };
@@ -32,7 +33,8 @@ const Header = ({setLivePriceData}) => {
           <FaBell className="text-blue-400 mb-2 text-4xl animate-pulse" />
         </div>
         <p className="text-lg text-gray-300">Stay updated with real-time cryptocurrency prices and set alerts for your favorite tokens.</p>
-        {liveData && <p>Live price updated</p>}
+        {/* {liveData && <p>Live price updated</p>} */}
+        {/* {liveData && <p>Live price updated</p>} */}
         {/* {liveData && (
           <div className="mt-4 text-white">
             <h2 className="text-2xl font-bold">Latest Data:</h2>

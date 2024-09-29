@@ -1,10 +1,53 @@
 import { NextRequest } from "next/server";
 import { NatsService } from "../../../pubsub/nats";
 import { createAppJwt } from "../../../pubsub/userJwt";
+import nodemailer from "nodemailer";
+import { alertModel } from "@/db/models/alerts";
+import { dbConnect } from "@/db/dbConnect";
 
 let service: NatsService | null = null;
 
+
+const transporter=nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+// export function createTransporter() {
+//   return nodemailer.createTransport({
+//     host: process.env.EMAIL_HOST,
+//     port: process.env.EMAIL_PORT,
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//   });
+// }
+
+export async function sendAlertEmail(alert, currentPrice) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: alert.email,
+    subject: `Price Alert: ${alert.token} has reached your target price!`,
+    text: `The price of ${alert.token} has reached $${currentPrice}, meeting your alert condition of $${alert.targetPrice}.`,
+  });
+}
+
+async function sendAlerts(livePrices){
+  console.log("sendAlert fn called with data : ",livePrices);
+  const allAlerts=await alertModel.find({});
+  allAlerts.forEach((alert)=>{
+
+  })
+}
+
+
+
 export async function GET(req: NextRequest) {
+  dbConnect();
   const responseStream = new TransformStream();
   const writer = responseStream.writable.getWriter();
   const encoder = new TextEncoder();
@@ -26,6 +69,7 @@ export async function GET(req: NextRequest) {
 
     service.addHandler(subject, async (data: Uint8Array) => {
       const decodedData = new TextDecoder().decode(data);
+      sendAlerts(decodedData);
       console.log(`Received message on ${subject}: ${decodedData}`);
       await writer.write(encoder.encode(`data: ${decodedData}\n\n`));
     });
