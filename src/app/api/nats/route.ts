@@ -28,20 +28,48 @@ const transporter=nodemailer.createTransport({
 // }
 
 export async function sendAlertEmail(alert, currentPrice) {
-  await transporter.sendMail({
+  console.log("sendAlertEmail called with",alert , "and curr price",currentPrice);
+  const response=await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to: alert.email,
     subject: `Price Alert: ${alert.token} has reached your target price!`,
     text: `The price of ${alert.token} has reached $${currentPrice}, meeting your alert condition of $${alert.targetPrice}.`,
   });
+  console.log("response : ",response);
 }
 
 async function sendAlerts(livePrices){
-  console.log("sendAlert fn called with data : ",livePrices);
-  const allAlerts=await alertModel.find({});
-  allAlerts.forEach((alert)=>{
+  console.log("sendAlert fn called with data : ", livePrices);
+  console.log("Keys in livePrices: ", Object.keys(livePrices));
+  
+  console.log(typeof livePrices);
+  
+  livePrices=JSON.parse(livePrices);
+  console.log(typeof livePrices);
+  console.log("Keys in livePrices: ", Object.keys(livePrices));
 
-  })
+
+  
+  console.log("sendAlert fn called with data : ", livePrices["ETH"]);
+  console.log("sendAlert fn called with dataa : ", livePrices.ETH);
+  // console.log("sendAlert fn called with data : ",livePrices['ETH'].price);
+  const allAlerts = await alertModel.find({});
+  // console.log("sendAlert fn called with data : ",livePrices[allAlerts[0].symbol].price);
+  console.log("all alerts before sending : ", allAlerts);
+  for (const alert of allAlerts) {
+    console.log("alert : ",alert);
+    console.log("alert type : ",typeof alert);
+    console.log("alert type : ",typeof alert.symbol);
+    console.log("symbol : ",alert.symbol);
+    console.log("Liveprice symbol : ",livePrices[alert.symbol]);
+    console.log("bool : ", alert.targetPrice <= livePrices[alert.symbol].price);
+
+    if (livePrices[alert.symbol] && alert.targetPrice <= livePrices[alert.symbol].price) {
+      await sendAlertEmail(alert, livePrices[alert.symbol].price);
+      await alertModel.findByIdAndDelete(alert._id);
+    }
+  }
+  console.log("all alerts after sending : ", allAlerts);
 }
 
 
@@ -69,8 +97,8 @@ export async function GET(req: NextRequest) {
 
     service.addHandler(subject, async (data: Uint8Array) => {
       const decodedData = new TextDecoder().decode(data);
-      sendAlerts(decodedData);
       console.log(`Received message on ${subject}: ${decodedData}`);
+      sendAlerts(decodedData);
       await writer.write(encoder.encode(`data: ${decodedData}\n\n`));
     });
 
