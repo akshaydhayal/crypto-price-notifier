@@ -18,7 +18,7 @@ export function createAppJwt(
 function generateUserJwt({
   userSeed,
   developerSeed,
-  expirationDate,
+  // expirationDate,
 }: {
   userSeed: string;
   developerSeed: string;
@@ -30,7 +30,7 @@ function generateUserJwt({
   const payload = {
     jti: getJti(),
     iat: getIat(),
-    exp: getExp(expirationDate),
+    // exp: getExp(expirationDate),
     iss: developer.getPublicKey(),
     name: "developer",
     sub: user.getPublicKey(),
@@ -42,9 +42,9 @@ function generateUserJwt({
   return jwt;
 }
 
-function getExp(expirationDate: Date) {
-  return Math.round(expirationDate.getTime() / 1000);
-}
+// function getExp(expirationDate: Date) {
+//   return Math.round(expirationDate.getTime() / 1000);
+// }
 
 function getJti() {
   return uuid("localhost", uuid.URL).toString();
@@ -54,7 +54,8 @@ function getIat() {
   return Math.round(Date.now() / 1000);
 }
 
-function signJwt(payload: any, keyPair: KeyPair): string {
+// @ts-expect-error This method accepts any JSON-serializable data
+function signJwt(payload, keyPair: KeyPair): string {
   const header = {
     typ: "JWT",
     alg: "ed25519-nkey",

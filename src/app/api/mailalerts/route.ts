@@ -1,7 +1,7 @@
 import { alertModel } from "@/db/models/alerts";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req:NextRequest,res:NextResponse){
+export async function POST(req:NextRequest){
     try{
         const {token,symbol,email,price}=await req.json();
         const alert=new alertModel({token,symbol,email,targetPrice:price});

@@ -1,18 +1,22 @@
 "use client";
-import { dbConnect } from "@/db/dbConnect";
-import React, { useEffect, useState } from "react";
+// import { dbConnect } from "@/db/dbConnect";
+import React, { useEffect } from "react";
 import { FaBell } from "react-icons/fa";
 
-const Header = ({setLivePriceData}) => {
+//@ts-expect-error arguments
+const Header = ({ setLivePriceData, setUpdatedAt }) => {
   // const [liveData, setLiveData] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const eventSource = new EventSource("/api/nats");
 
     eventSource.onmessage = (event) => {
       // setLiveData(event.data);
       setLivePriceData(JSON.parse(event.data));
-      console.log('type event data : ',typeof(event.data));
+      setUpdatedAt(new Date().toLocaleString());
+      console.log("type event data : ", typeof event.data);
     };
 
     eventSource.onerror = (error) => {

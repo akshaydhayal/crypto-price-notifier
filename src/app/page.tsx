@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { Input } from "@/components/ui/input";
-import { dbConnect } from "@/db/dbConnect";
+// import { dbConnect } from "@/db/dbConnect";
 
 const tokenIds = {
   AKT: "akash-network",
@@ -36,9 +36,17 @@ export default function Home() {
   const [livePriceData, setLivePriceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState(null);
+  const [selectedToken, setSelectedToken] = useState<null | {
+    id: string;
+    name: string;
+    image: string;
+    symbol: string;
+    current_price: number;
+    market_cap: number;
+  }>(null);
   const [alertPrice, setAlertPrice] = useState("");
   const [alertEmail, setAlertEmail] = useState("");
+  const [updatedAt,setUpdatedAt]=useState(null);
 
   
   useEffect(() => {
@@ -56,6 +64,7 @@ export default function Home() {
             sparkline: false,
           },
         });
+        console.log("setotken bfore stting",response.data);
         setTokens(response.data);
         setLoading(false);
       } catch (error) {
@@ -67,6 +76,7 @@ export default function Home() {
     fetchTokens();
   }, []);
 
+  //@ts-expect-error argument
   const handleSetAlert = (token) => {
     setSelectedToken(token);
     setIsAlertModalOpen(true);
@@ -81,14 +91,12 @@ export default function Home() {
 
   const handleSubmitAlert = async () => {
     try {
-      await axios.post("/api/mailalerts", {
-        token: selectedToken.id,
-        symbol:selectedToken.symbol.toUpperCase(),
-        price: parseFloat(alertPrice),
-        email: alertEmail,
-      });
-
-      alert(`Alert set for ${selectedToken.name} at $${alertPrice}. You'll be notified at ${alertEmail}`);
+      await axios.post("/api/mailalerts", 
+        {token: selectedToken?.id,symbol:selectedToken?.symbol.toUpperCase(),price: parseFloat(alertPrice),
+          email: alertEmail,
+        });
+        
+      alert(`Alert set for ${selectedToken?.name} at $${alertPrice}. You'll be notified at ${alertEmail}`);
       handleCloseAlertModal();
     } catch (error) {
       console.error("Error setting alert:", error);
@@ -106,13 +114,13 @@ export default function Home() {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white w-screen">
-      <Header setLivePriceData={setLivePriceData} />
+      <Header setLivePriceData={setLivePriceData} setUpdatedAt={setUpdatedAt} />
 
       <div className="container mx-auto px-4 py-4 w-4/5">
         <div className="overflow-x-auto">
           <div className="flex justify-between items-center mb-4">
             {/* <h1 className="text-2xl font-semibold">Token Prices ${livePriceData?"(Live Data)":"(Stale Data)"}(Stale Data)</h1> */}
-            <h1 className="text-2xl font-semibold">Token Prices {livePriceData?"(Live Data)":"(Stale Data)"}</h1>
+            <h1 className="text-2xl font-semibold">Token Prices {livePriceData ? "(Live Data)" : "(Stale Data)"}</h1>
             {!livePriceData ? (
               <div className="flex items-center text-yellow-400 text-sm">
                 <span className="mr-2">Getting Live Data</span>
@@ -122,7 +130,7 @@ export default function Home() {
                 </svg>
               </div>
             ) : (
-              <p className="text-green-400">Live prices updated</p>
+              <p className="text-green-400">Live prices last updated at {updatedAt}</p>
             )}
           </div>
 
@@ -138,7 +146,7 @@ export default function Home() {
             </thead>
             <tbody>
               {tokens.length > 0 &&
-                tokens.map((token, index) => (
+                tokens.map((token:{id:string,name:string,image:string,symbol:string,current_price:number,market_cap:number}, index) => (
                   <tr key={token.id} className="border-b border-gray-700 hover:bg-gray-700 transition duration-200">
                     <td className="py-4 px-6 text-base font-medium">{index + 1}</td>
                     <td className="py-4 px-6 flex items-center">
@@ -146,6 +154,7 @@ export default function Home() {
                       <span className="text-base font-medium">{token.name}</span>
                     </td>
                     {livePriceData && livePriceData[token.symbol.toUpperCase()] ? (
+                      //@ts-expect-error ignore
                       <td className="py-4 px-6 text-base font-medium text-green-400">${livePriceData[token.symbol.toUpperCase()].price.toFixed(2)}</td>
                     ) : (
                       <td className="py-4 px-6 text-base font-medium">${token.current_price.toLocaleString()}</td>
