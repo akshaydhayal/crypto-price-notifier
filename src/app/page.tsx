@@ -104,18 +104,20 @@ export default function Home() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="bg-gray-900 min-h-screen flex justify-center items-center text-white">
-        <p className="animate-pulse">Loading tokens...</p>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="bg-gray-900 min-h-screen flex justify-center items-center text-white">
+  //       <p className="animate-pulse">Loading tokens...</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="bg-gray-900 min-h-screen text-white w-screen">
       <Header setLivePriceData={setLivePriceData} setUpdatedAt={setUpdatedAt} />
-
+      {/* {loading?<div className="bg-gray-900 min-h-[70vh] flex justify-center items-center text-white">
+        <p className="animate-pulse">Loading tokens...</p>
+      </div>: */}
       <div className="container mx-auto px-4 py-4 w-4/5">
         <div className="overflow-x-auto">
           <div className="flex justify-between items-center mb-4">
@@ -123,7 +125,7 @@ export default function Home() {
             <h1 className="text-2xl font-semibold">Token Prices {livePriceData ? "(Live Data)" : "(Stale Data)"}</h1>
             {!livePriceData ? (
               <div className="flex items-center text-yellow-400 text-sm">
-                <span className="mr-2">Getting Live Data</span>
+                <span className="mr-2">Getting Live Data from Synternet Data Stream</span>
                 <svg className="animate-spin h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
@@ -133,7 +135,10 @@ export default function Home() {
               <p className="text-green-400">Live prices last updated at {updatedAt}</p>
             )}
           </div>
-
+          {loading ? 
+            <div className="bg-gray-900 min-h-[55vh] flex justify-center items-center text-white">
+              <p className="animate-pulse">Loading tokens...</p>
+            </div>:
           <table className="w-full bg-gray-800 rounded-lg shadow-md">
             <thead>
               <tr className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
@@ -144,34 +149,36 @@ export default function Home() {
                 <th className="py-3 px-6 text-left text-lg font-semibold">Alert</th>
               </tr>
             </thead>
-            <tbody>
-              {tokens.length > 0 &&
-                tokens.map((token:{id:string,name:string,image:string,symbol:string,current_price:number,market_cap:number}, index) => (
-                  <tr key={token.id} className="border-b border-gray-700 hover:bg-gray-700 transition duration-200">
-                    <td className="py-4 px-6 text-base font-medium">{index + 1}</td>
-                    <td className="py-4 px-6 flex items-center">
-                      <img src={token.image} alt={token.name} className="w-8 h-8 mr-3 rounded-full shadow-md" />
-                      <span className="text-base font-medium">{token.name}</span>
-                    </td>
-                    {livePriceData && livePriceData[token.symbol.toUpperCase()] ? (
-                      //@ts-expect-error ignore
-                      <td className="py-4 px-6 text-base font-medium text-green-400">${livePriceData[token.symbol.toUpperCase()].price.toFixed(2)}</td>
-                    ) : (
-                      <td className="py-4 px-6 text-base font-medium">${token.current_price.toLocaleString()}</td>
-                    )}
-                    <td className="py-4 px-6 text-base font-medium">${token.market_cap.toLocaleString()}</td>
-                    <td className="py-4 px-6">
-                      <button
-                        onClick={() => handleSetAlert(token)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200"
-                      >
-                        Set Alert
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
+          
+              <tbody>
+                {tokens.length > 0 &&
+                  tokens.map((token: { id: string; name: string; image: string; symbol: string; current_price: number; market_cap: number }, index) => (
+                    <tr key={token.id} className="border-b border-gray-700 hover:bg-gray-700 transition duration-200">
+                      <td className="py-4 px-6 text-base font-medium">{index + 1}</td>
+                      <td className="py-4 px-6 flex items-center">
+                        <img src={token.image} alt={token.name} className="w-8 h-8 mr-3 rounded-full shadow-md" />
+                        <span className="text-base font-medium">{token.name}</span>
+                      </td>
+                      {livePriceData && livePriceData[token.symbol.toUpperCase()] ? (
+                        //@ts-expect-error ignore
+                        <td className="py-4 px-6 text-base font-medium text-green-400">${livePriceData[token.symbol.toUpperCase()].price.toFixed(2)}</td>
+                      ) : (
+                        <td className="py-4 px-6 text-base font-medium">${token.current_price.toLocaleString()}</td>
+                      )}
+                      <td className="py-4 px-6 text-base font-medium">${token.market_cap.toLocaleString()}</td>
+                      <td className="py-4 px-6">
+                        <button
+                          onClick={() => handleSetAlert(token)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200"
+                        >
+                          Set Alert
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
           </table>
+          }
         </div>
       </div>
 
