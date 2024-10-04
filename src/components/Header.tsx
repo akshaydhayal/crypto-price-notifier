@@ -80,7 +80,6 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
         eventSourceRef.current.close();
       }
     };
-  // }, [setLivePriceData]);
   }, []);
 
   // useEffect(() => {

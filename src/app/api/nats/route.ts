@@ -66,9 +66,14 @@ export async function GET() {
       natsCredsFile: createAppJwt(accessToken),
     });
 
-    console.log("Connecting to NATS server...");
-    await service.waitForConnection();
-    console.log("Connected to NATS server.");
+     try {
+       console.log("Connecting to NATS server...");
+       await service.waitForConnection();
+       console.log("Connected to NATS server.");
+     } catch (error) {
+       console.error("Failed to connect to NATS server:", error);
+       return NextResponse.json({ error: "Failed to connect to NATS" }, { status: 500 });
+     }
 
     service.addHandler(subject, async (data: Uint8Array) => {
       const decodedData = new TextDecoder().decode(data);
@@ -76,6 +81,11 @@ export async function GET() {
       await sendAlerts(decodedData);
       await writer.write(encoder.encode(`data: ${decodedData}\n\n`));
     });
+
+     setInterval(() => {
+      writer.write(encoder.encode(`data: ping\n\n`));
+    }, 10 * 1000); // Send ping every 30 seconds
+  }
 
     await service.serve();
   }
