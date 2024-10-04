@@ -84,8 +84,8 @@ export async function GET() {
 
      setInterval(() => {
       writer.write(encoder.encode(`data: ping\n\n`));
-    }, 1 * 1500); // Send ping every 30 seconds
-  // }
+    }, 6 * 1000); // Send ping every 30 seconds
+  
 
     await service.serve();
   }
