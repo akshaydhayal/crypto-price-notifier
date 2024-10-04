@@ -21,6 +21,12 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
       //   eventSourceRef.current.close();
       // }
 
+      // Only reconnect if there's no existing open connection
+      //@ts-expect-error ignmore
+      if (eventSourceRef.current && eventSourceRef.current.readyState !== EventSource.CLOSED) {
+        return;
+      }
+
       const eventSource = new EventSource("/api/nats");
       //@ts-expect-error close
       eventSourceRef.current = eventSource;
@@ -53,16 +59,16 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
         // setTimeout(connectEventSource, 5000);
         if (eventSource.readyState === EventSource.CLOSED) {
           console.log("Connection closed. Attempting to reconnect...");
-           setIsConnected(false);
+          setIsConnected(false);
           //  eventSource.close();
-           setTimeout(connectEventSource, 5000);
-         }else if (eventSource.readyState === EventSource.CONNECTING) {
-           console.log("Connection is in CONNECTING state. Waiting...");
-           // Optionally set a different state here, like "reconnecting"
-         } else {
-           console.log("Unexpected error state:", eventSource.readyState);
-           // You might want to handle this case differently
-         }
+          setTimeout(connectEventSource, 5000);
+        } else if (eventSource.readyState === EventSource.CONNECTING) {
+          console.log("Connection is in CONNECTING state. Waiting...");
+          // Optionally set a different state here, like "reconnecting"
+        } else {
+          console.log("Unexpected error state:", eventSource.readyState);
+          // You might want to handle this case differently
+        }
       };
     };
 
