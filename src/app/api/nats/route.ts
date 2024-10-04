@@ -82,9 +82,9 @@ export async function GET() {
       await writer.write(encoder.encode(`data: ${decodedData}\n\n`));
     });
 
-     setInterval(() => {
-      writer.write(encoder.encode(`data: ping\n\n`));
-    }, 1700); // Send ping every 30 seconds
+    //  setInterval(() => {
+    //   writer.write(encoder.encode(`data: ping\n\n`));
+    // }, 1700); // Send ping every 30 seconds
   
 
     await service.serve();
