@@ -52,9 +52,16 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
         // eventSource.close();
         // setTimeout(connectEventSource, 5000);
         if (eventSource.readyState === EventSource.CLOSED) {
+          console.log("Connection closed. Attempting to reconnect...");
            setIsConnected(false);
-           eventSource.close();
+          //  eventSource.close();
            setTimeout(connectEventSource, 5000);
+         }else if (eventSource.readyState === EventSource.CONNECTING) {
+           console.log("Connection is in CONNECTING state. Waiting...");
+           // Optionally set a different state here, like "reconnecting"
+         } else {
+           console.log("Unexpected error state:", eventSource.readyState);
+           // You might want to handle this case differently
          }
       };
     };
