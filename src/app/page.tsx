@@ -183,7 +183,7 @@ export default function Home() {
             <AlertDialogDescription>
               Set an alert for {selectedToken?.name}. Current price: $
               {/* Set an alert for {selectedToken?.name}. Current price: ${selectedToken?.current_price.toLocaleString()} $ */}
-              {/* {livePriceData && selectedToken && livePriceData[selectedToken.symbol.toUpperCase()].price.toFixed(2)} */}
+              {/* @ts-expect-error ignore */}
               {selectedToken && livePriceData?livePriceData[selectedToken.symbol.toUpperCase()].price.toFixed(2): selectedToken?.current_price.toLocaleString()}
             </AlertDialogDescription>
           </AlertDialogHeader>
