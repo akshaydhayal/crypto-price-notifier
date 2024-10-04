@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/nats.js": {
+      "maxDuration": 60
+    }
+  }
+}
