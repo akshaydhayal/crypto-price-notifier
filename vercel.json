@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/nats.js": {
+    "api/nats/route.ts": {
       "maxDuration": 60
     }
   }
