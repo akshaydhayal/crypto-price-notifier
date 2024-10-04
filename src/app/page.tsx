@@ -91,10 +91,13 @@ export default function Home() {
 
   const handleSubmitAlert = async () => {
     try {
-      await axios.post("/api/mailalerts", 
-        {token: selectedToken?.id,symbol:selectedToken?.symbol.toUpperCase(),price: parseFloat(alertPrice),
-          email: alertEmail,
-        });
+      // await axios.post("/api/mailalerts", 
+      await axios.post("http://ec2-13-61-2-185.eu-north-1.compute.amazonaws.com:3000/alerts", {
+        token: selectedToken?.id,
+        symbol: selectedToken?.symbol.toUpperCase(),
+        targetPrice: parseFloat(alertPrice),
+        email: alertEmail,
+      });
         
       alert(`Alert set for ${selectedToken?.name} at $${alertPrice}. You'll be notified at ${alertEmail}`);
       handleCloseAlertModal();
@@ -107,7 +110,7 @@ export default function Home() {
   return (
     <div className="bg-gray-900 min-h-screen text-white w-screen">
       <Header setLivePriceData={setLivePriceData} setUpdatedAt={setUpdatedAt} />
-    
+
       <div className="container mx-auto px-4 py-4 w-4/5">
         <div className="overflow-x-auto">
           <div className="flex justify-between items-center mb-4">
@@ -125,21 +128,22 @@ export default function Home() {
               <p className="text-green-400">Live prices last updated at {updatedAt}</p>
             )}
           </div>
-          {loading ? 
+          {loading ? (
             <div className="bg-gray-900 min-h-[55vh] flex justify-center items-center text-white">
               <p className="animate-pulse">Loading tokens...</p>
-            </div>:
-          <table className="w-full bg-gray-800 rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
-                <th className="py-3 px-6 text-left text-lg font-semibold">#</th>
-                <th className="py-3 px-6 text-left text-lg font-semibold">Token</th>
-                <th className="py-3 px-6 text-left text-lg font-semibold">Price (USD)</th>
-                <th className="py-3 px-6 text-left text-lg font-semibold">Market Cap</th>
-                <th className="py-3 px-6 text-left text-lg font-semibold">Alert</th>
-              </tr>
-            </thead>
-          
+            </div>
+          ) : (
+            <table className="w-full bg-gray-800 rounded-lg shadow-md">
+              <thead>
+                <tr className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
+                  <th className="py-3 px-6 text-left text-lg font-semibold">#</th>
+                  <th className="py-3 px-6 text-left text-lg font-semibold">Token</th>
+                  <th className="py-3 px-6 text-left text-lg font-semibold">Price (USD)</th>
+                  <th className="py-3 px-6 text-left text-lg font-semibold">Market Cap</th>
+                  <th className="py-3 px-6 text-left text-lg font-semibold">Alert</th>
+                </tr>
+              </thead>
+
               <tbody>
                 {tokens.length > 0 &&
                   tokens.map((token: { id: string; name: string; image: string; symbol: string; current_price: number; market_cap: number }, index) => (
@@ -167,8 +171,8 @@ export default function Home() {
                     </tr>
                   ))}
               </tbody>
-          </table>
-          }
+            </table>
+          )}
         </div>
       </div>
 
@@ -177,7 +181,10 @@ export default function Home() {
           <AlertDialogHeader>
             <AlertDialogTitle>Set Price Alert</AlertDialogTitle>
             <AlertDialogDescription>
-              Set an alert for {selectedToken?.name}. Current price: ${selectedToken?.current_price.toLocaleString()}
+              Set an alert for {selectedToken?.name}. Current price: $
+              {/* Set an alert for {selectedToken?.name}. Current price: ${selectedToken?.current_price.toLocaleString()} $ */}
+              {/* {livePriceData && selectedToken && livePriceData[selectedToken.symbol.toUpperCase()].price.toFixed(2)} */}
+              {selectedToken && livePriceData?livePriceData[selectedToken.symbol.toUpperCase()].price.toFixed(2): selectedToken?.current_price.toLocaleString()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="grid gap-4 py-4">
