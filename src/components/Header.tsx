@@ -16,14 +16,20 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
     const connectEventSource = () => {
       if (typeof window === "undefined") return;
 
-      if (eventSourceRef.current) {
-        //@ts-expect-error close
-        eventSourceRef.current.close();
-      }
+      // if (eventSourceRef.current) {
+      //   //@ts-expect-error close
+      //   eventSourceRef.current.close();
+      // }
 
       const eventSource = new EventSource("/api/nats");
       //@ts-expect-error close
       eventSourceRef.current = eventSource;
+
+      // let eventSource;
+      // if (!eventSourceRef.current || eventSourceRef.current.readyState === EventSource.CLOSED) {
+      //   eventSource = new EventSource("/api/nats");
+      //   eventSourceRef.current = eventSource;
+      // }
 
       eventSource.onopen = () => {
         console.log("EventSource connected");
