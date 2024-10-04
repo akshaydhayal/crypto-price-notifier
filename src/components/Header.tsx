@@ -48,9 +48,14 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
 
       eventSource.onerror = (error) => {
         console.error("EventSource failed:", error);
-        setIsConnected(false);
-        eventSource.close();
-        setTimeout(connectEventSource, 5000);
+        // setIsConnected(false);
+        // eventSource.close();
+        // setTimeout(connectEventSource, 5000);
+        if (eventSource.readyState === EventSource.CLOSED) {
+           setIsConnected(false);
+           eventSource.close();
+           setTimeout(connectEventSource, 5000);
+         }
       };
     };
 
