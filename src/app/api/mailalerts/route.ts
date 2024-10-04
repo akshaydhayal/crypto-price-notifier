@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req:NextRequest){
     try{
-        const {token,symbol,email,price}=await req.json();
-        const alert=new alertModel({token,symbol,email,targetPrice:price});
+        const {token,symbol,email,targetPrice}=await req.json();
+        const alert=new alertModel({token,symbol,email,targetPrice});
         await alert.save();
         return NextResponse.json({msg:"Mail alert set for"+token},{status:200});
     }catch(e){

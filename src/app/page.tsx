@@ -91,8 +91,8 @@ export default function Home() {
 
   const handleSubmitAlert = async () => {
     try {
-      // await axios.post("/api/mailalerts", 
-      await axios.post("http://ec2-13-61-2-185.eu-north-1.compute.amazonaws.com:3000/alerts", {
+      await axios.post("/api/mailalerts",{
+      // await axios.post("http://ec2-13-61-2-185.eu-north-1.compute.amazonaws.com:3000/alerts", {
         token: selectedToken?.id,
         symbol: selectedToken?.symbol.toUpperCase(),
         targetPrice: parseFloat(alertPrice),
