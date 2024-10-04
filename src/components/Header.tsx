@@ -54,7 +54,7 @@ const Header = ({ setLivePriceData, setUpdatedAt }) => {
         if (eventSource.readyState === EventSource.CLOSED) {
            setIsConnected(false);
            eventSource.close();
-           setTimeout(connectEventSource, 5000);
+           setTimeout(connectEventSource, 65000);
          }
       };
     };
