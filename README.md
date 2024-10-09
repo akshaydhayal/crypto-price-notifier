@@ -17,9 +17,15 @@ The Token Notifier project is a user-friendly web application that provides real
 ![Mission Dashboard](https://github.com/akshaydhayal/crypto-price-notifier/blob/main/Create-Next-App%20(3).png)
 
 *Figure 1: Live Token Prices Dashboard*
-![Mission Dashboard](https://github.com/akshaydhayal/crypto-price-notifier/blob/main/Create-Next-App%20(4).png)
 
+
+![Mission Dashboard](https://github.com/akshaydhayal/crypto-price-notifier/blob/main/Create-Next-App%20(4).png)
 *Figure 2: Setting the Price Email Alert*
+
+![Mission Dashboard](https://github.com/akshaydhayal/crypto-price-notifier/blob/main/alert.png)
+*Figure 3: Price notifier successfully set*
+![Mission Dashboard](https://github.com/akshaydhayal/crypto-price-notifier/blob/main/alertResponse.png)
+*Figure 4: Recieved the Email notification when Token price hits the set threshold price*
 
 
 
