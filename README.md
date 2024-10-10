@@ -30,7 +30,7 @@ The Token Notifier project is a user-friendly web application that provides real
 
 
 ## Video Demo:
-
+https://www.loom.com/share/868a90034729494ba983df301689e6b7?sid=29045e71-7063-482c-888c-4ea1fcacfe06
 
 ## Technologies Used
 
